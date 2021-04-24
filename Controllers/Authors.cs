@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using CourseLibrary.API.DbContexts;
 using CourseLibrary.API.Models;
+using CourseLibrary.API.ResourceParams;
 using CourseLibrary.API.Services;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -33,20 +34,19 @@ namespace CourseLibrary.API.Controllers
         public ActionResult CreateAuthor([FromBody] CreateAuthorDto author)
         {
             var newAuthor = mapper.Map<Entities.Author>(author);
-            courseLibrary.Authors.Add(newAuthor);
+            courseLib.AddAuthor(newAuthor);
             var response = mapper.Map<Models.AuthorDto>(newAuthor);
             courseLib.Save();
-            return Created($"api/Authors/{ response.Id }", response);
+            return CreatedAtRoute("authorRoute", new { authorId = response.Id}, response);
         }
 
 
 
         [HttpGet]
         [HttpHead]
-        public ActionResult<IEnumerable<AuthorDto>> GetAuthors( [FromQuery] string mainCategory,
-            string searchQuery)
+        public ActionResult<IEnumerable<AuthorDto>> GetAuthors( [FromQuery] AuthorsParams queries)
         {
-            var databaseResult = courseLib.GetAuthors(mainCategory, searchQuery);
+            var databaseResult = courseLib.GetAuthors(queries);
 
             return Ok(mapper.Map<IEnumerable<AuthorDto>>(databaseResult));
         }
