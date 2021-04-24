@@ -1,4 +1,6 @@
-﻿using CourseLibrary.API.DbContexts;
+﻿using AutoMapper;
+using CourseLibrary.API.DbContexts;
+using CourseLibrary.API.Models;
 using CourseLibrary.API.Services;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -14,28 +16,61 @@ namespace CourseLibrary.API.Controllers
     {
         private readonly CourseLibraryContext courseLibrary;
         private readonly ICourseLibraryRepository courseLib;
+        private readonly IMapper mapper;
 
-        public Authors(CourseLibraryContext courseLibrary, ICourseLibraryRepository courseLibraryRepository)
+        public Authors(CourseLibraryContext courseLibrary, 
+            ICourseLibraryRepository courseLibraryRepository, 
+            IMapper mapper)
         {
             this.courseLibrary = courseLibrary;
             this.courseLib = courseLibraryRepository;
+            this.mapper = mapper;
         }
 
         public CourseLibraryRepository CourseLibraryRepository { get; }
 
-        [HttpGet]
-        public IActionResult GetAuthors()
+        [HttpPost]
+        public ActionResult CreateAuthor([FromBody] CreateAuthorDto author)
         {
-            var result = courseLib.GetAuthors();
-            return Ok(result);
+            var newAuthor = mapper.Map<Entities.Author>(author);
+            courseLibrary.Authors.Add(newAuthor);
+            var response = mapper.Map<Models.AuthorDto>(newAuthor);
+            courseLib.Save();
+            return Ok(response);
         }
-        [HttpGet("{authorId}")]
-        public IActionResult GetAuthor(Guid authorId)
+
+        [HttpGet]
+        public ActionResult<IEnumerable<AuthorDto>> GetAuthors()
         {
-            var result = courseLib.GetAuthor(authorId);
-            if (result == null)
+            var databaseResult = courseLib.GetAuthors();
+
+            return Ok(mapper.Map<IEnumerable<AuthorDto>>(databaseResult));
+        }
+        [HttpGet("{authorId}", Name = "authorRoute")]
+        public ActionResult<AuthorDto> GetAuthor(Guid authorId)
+        {
+            var databaseResult = courseLib.GetAuthor(authorId);
+            if (databaseResult == null)
                 return NotFound();
-            return Ok(result);
+            return Ok(mapper.Map<AuthorDto>(databaseResult));
+        }
+        [HttpGet("{authorId}/courses")]
+        public ActionResult<IEnumerable<CoursesDto>> GetCourses(Guid authorId)
+        {
+            if (!courseLib.AuthorExists(authorId))
+                return NotFound();
+            var databaseResult = courseLib.GetCourses(authorId);
+            return Ok(mapper.Map<IEnumerable<CoursesDto>>(databaseResult));
+        }
+        [HttpGet("{authorId}/courses/{courseId}")]
+        public ActionResult<CoursesDto> GetCourse(Guid authorId, Guid courseId)
+        {
+            if (!courseLib.AuthorExists(authorId))
+                return NotFound();
+            var databaseResult = courseLib.GetCourse(authorId, courseId);
+            if (databaseResult == null)
+                return NotFound();
+            return Ok(mapper.Map<CoursesDto>(databaseResult));
         }
     }
 }

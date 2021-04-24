@@ -59,5 +59,7 @@ C:\Users\User\source\repos\CourseLibrary.API\bin\Debug\netcoreapp3.1\runtimes\wi
 C:\Users\User\source\repos\CourseLibrary.API\bin\Debug\netcoreapp3.1\runtimes\win\lib\netstandard2.0\System.Security.Cryptography.ProtectedData.dll
 C:\Users\User\source\repos\CourseLibrary.API\bin\Debug\netcoreapp3.1\Humanizer.dll
 C:\Users\User\source\repos\CourseLibrary.API\bin\Debug\netcoreapp3.1\Microsoft.EntityFrameworkCore.Design.dll
+C:\Users\User\source\repos\CourseLibrary.API\bin\Debug\netcoreapp3.1\AutoMapper.dll
+C:\Users\User\source\repos\CourseLibrary.API\bin\Debug\netcoreapp3.1\AutoMapper.Extensions.Microsoft.DependencyInjection.dll
 C:\Users\User\source\repos\CourseLibrary.API\obj\Debug\netcoreapp3.1\CourseLibrary.API.csproj.CoreCompileInputs.cache
 C:\Users\User\source\repos\CourseLibrary.API\obj\Debug\netcoreapp3.1\CourseLibrary.API.MvcApplicationPartsAssemblyInfo.cache
