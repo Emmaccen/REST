@@ -36,16 +36,21 @@ namespace CourseLibrary.API.Controllers
             courseLibrary.Authors.Add(newAuthor);
             var response = mapper.Map<Models.AuthorDto>(newAuthor);
             courseLib.Save();
-            return Ok(response);
+            return Created($"api/Authors/{ response.Id }", response);
         }
 
+
+
         [HttpGet]
-        public ActionResult<IEnumerable<AuthorDto>> GetAuthors()
+        [HttpHead]
+        public ActionResult<IEnumerable<AuthorDto>> GetAuthors( [FromQuery] string mainCategory,
+            string searchQuery)
         {
-            var databaseResult = courseLib.GetAuthors();
+            var databaseResult = courseLib.GetAuthors(mainCategory, searchQuery);
 
             return Ok(mapper.Map<IEnumerable<AuthorDto>>(databaseResult));
         }
+
         [HttpGet("{authorId}", Name = "authorRoute")]
         public ActionResult<AuthorDto> GetAuthor(Guid authorId)
         {
@@ -54,23 +59,6 @@ namespace CourseLibrary.API.Controllers
                 return NotFound();
             return Ok(mapper.Map<AuthorDto>(databaseResult));
         }
-        [HttpGet("{authorId}/courses")]
-        public ActionResult<IEnumerable<CoursesDto>> GetCourses(Guid authorId)
-        {
-            if (!courseLib.AuthorExists(authorId))
-                return NotFound();
-            var databaseResult = courseLib.GetCourses(authorId);
-            return Ok(mapper.Map<IEnumerable<CoursesDto>>(databaseResult));
-        }
-        [HttpGet("{authorId}/courses/{courseId}")]
-        public ActionResult<CoursesDto> GetCourse(Guid authorId, Guid courseId)
-        {
-            if (!courseLib.AuthorExists(authorId))
-                return NotFound();
-            var databaseResult = courseLib.GetCourse(authorId, courseId);
-            if (databaseResult == null)
-                return NotFound();
-            return Ok(mapper.Map<CoursesDto>(databaseResult));
-        }
+
     }
 }
