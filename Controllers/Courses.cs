@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace CourseLibrary.API.Controllers
 {
@@ -27,7 +26,7 @@ namespace CourseLibrary.API.Controllers
             this.mapper = mapper;
         }
 
-        [HttpGet]
+        [HttpGet(Name = "getCourses")]
         public ActionResult<IEnumerable<CoursesDto>> GetCourses(Guid authorId)
         {
             if (!courseLibraryRepository.AuthorExists(authorId))
@@ -51,17 +50,22 @@ namespace CourseLibrary.API.Controllers
         }
 
         [HttpPost]
-        public ActionResult<CoursesDto> CreateCourse(Guid authorId, CreateCoursesDto course)
+        public ActionResult<CoursesDto> CreateCourse(Guid authorId, IEnumerable<CreateCoursesDto> course)
         {
             if (!courseLibraryRepository.AuthorExists(authorId))
                 return NotFound();
+            if (course.Count() == 0)
+            {
+                ModelState.AddModelError("Empty Course", "You cannot create an empty course");
+                return BadRequest(ModelState);
+            }
 
-            var newCourse = mapper.Map<Entities.Course>(course);
+            var newCourse = mapper.Map<IEnumerable<Entities.Course>>(course);
             courseLibraryRepository.AddCourse(authorId, newCourse);
             courseLibraryRepository.Save();
-            return CreatedAtRoute("getCourse", 
-                new { courseId = newCourse.Id, authorId = newCourse.AuthorId },
-                mapper.Map<Models.CreateCoursesDto>(newCourse));
+            return CreatedAtRoute("getCourses",
+                new { authorId = authorId },
+                mapper.Map<IEnumerable<Models.CreateCoursesDto>>(newCourse));
         }
     }
 }

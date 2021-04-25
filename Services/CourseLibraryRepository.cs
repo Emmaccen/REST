@@ -16,20 +16,23 @@ namespace CourseLibrary.API.Services
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        public void AddCourse(Guid authorId, Course course)
+        public void AddCourse(Guid authorId, IEnumerable<Course> courses)
         {
             if (authorId == Guid.Empty)
             {
                 throw new ArgumentNullException(nameof(authorId));
             }
 
-            if (course == null)
+            if (courses == null)
             {
-                throw new ArgumentNullException(nameof(course));
+                throw new ArgumentNullException(nameof(courses));
             }
             // always set the AuthorId to the passed-in authorId
-            course.AuthorId = authorId;
-            _context.Courses.Add(course);
+            foreach (var item in courses)
+            {
+                item.AuthorId = authorId;
+                _context.Courses.Add(item);
+            }
         }
 
         public void DeleteCourse(Course course)
@@ -144,7 +147,7 @@ namespace CourseLibrary.API.Services
         }
 
 
-        public IEnumerable<Author> GetAuthors(IEnumerable<Guid> authorIds)
+        public IEnumerable<Author> sGetAuthors(IEnumerable<Guid> authorIds)
         {
             if (authorIds == null)
             {

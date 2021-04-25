@@ -6,7 +6,7 @@ namespace CourseLibrary.API.Entities
 {
     public class Course
     {
-        [Key]       
+        [Key]
         public Guid Id { get; set; }
 
         [Required]

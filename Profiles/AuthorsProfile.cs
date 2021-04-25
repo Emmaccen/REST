@@ -15,6 +15,8 @@ namespace CourseLibrary.API.Profiles
             ));
 
             CreateMap<Entities.Author, Models.CreateAuthorDto>().ReverseMap();
+
+            CreateMap<Entities.Author, Models.UpdateAuthorDto>().ReverseMap();
         }
     }
 }
