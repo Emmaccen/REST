@@ -52,6 +52,7 @@ namespace CourseLibrary.API.Controllers
         [HttpPost]
         public ActionResult<CoursesDto> CreateCourse(Guid authorId, IEnumerable<CreateCoursesDto> course)
         {
+            Console.WriteLine(course.GetType());
             if (!courseLibraryRepository.AuthorExists(authorId))
                 return NotFound();
             if (course.Count() == 0)

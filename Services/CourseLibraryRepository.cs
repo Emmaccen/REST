@@ -147,7 +147,7 @@ namespace CourseLibrary.API.Services
         }
 
 
-        public IEnumerable<Author> sGetAuthors(IEnumerable<Guid> authorIds)
+        public IEnumerable<Author> GetAuthors(IEnumerable<Guid> authorIds)
         {
             if (authorIds == null)
             {
