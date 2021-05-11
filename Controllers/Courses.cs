@@ -50,7 +50,7 @@ namespace CourseLibrary.API.Controllers
         }
 
         [HttpPost]
-        public ActionResult<CoursesDto> CreateCourse(Guid authorId, IEnumerable<CreateCoursesDto> course)
+        public ActionResult<IEnumerable<CreateCoursesDto>> CreateCourse(Guid authorId, IEnumerable<CreateCoursesDto> course)
         {
             Console.WriteLine(course.GetType());
             if (!courseLibraryRepository.AuthorExists(authorId))
@@ -67,6 +67,89 @@ namespace CourseLibrary.API.Controllers
             return CreatedAtRoute("getCourses",
                 new { authorId = authorId },
                 mapper.Map<IEnumerable<Models.CreateCoursesDto>>(newCourse));
+        }
+
+        [HttpPut("{courseId}")]
+        public ActionResult<UpdateCourseDto> UpdateCourseForAuthor(
+            Guid authorId, Guid courseId, UpdateCourseDto courseUpdate)
+        {
+            if (courseUpdate.Title == courseUpdate.Description) { }
+            ModelState.AddModelError("Title And Description", "Name and Description cannot be the same");
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (!courseLibraryRepository.AuthorExists(authorId))
+                return NotFound();
+            var databaseResult = courseLibraryRepository.GetCourse(authorId, courseId);
+
+            if (databaseResult == null)
+                return NotFound();
+
+            var update = mapper.Map(courseUpdate, databaseResult);
+            courseLibraryRepository.UpdateCourse(update);
+            courseLibraryRepository.Save();
+
+            return CreatedAtRoute("getCourse",
+                new { authorId = update.AuthorId, courseId = update.Id }
+                , mapper.Map<UpdateCourseDto>(update));
+        }
+
+       /* [HttpPatch]
+        public ActionResult<UpdateCourseDto> UpdateCourseForAuthor(
+            Guid authorId, Guid courseId, JsonPatchDocument<UpdateCourseDto> courseUpdate)
+        {
+            if (courseUpdate.Title == courseUpdate.Description) { }
+            ModelState.AddModelError("Title And Description", "Name and Description cannot be the same");
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (!courseLibraryRepository.AuthorExists(authorId))
+                return NotFound();
+
+            var databaseResult = courseLibraryRepository.GetCourse(authorId, courseId);
+
+            if (databaseResult == null)
+                return NotFound();
+
+            var courseToPatch = mapper.Map<UpdateAuthorDto>(databaseResult);
+
+            courseUpdate.ApplyTo(courseToPatch, ModelState);
+
+            if (!ModelState.IsValid || !TryValidateModel(courseToPatch))
+                return BadRequest();
+
+            var update = mapper.Map(courseToPatch, databaseResult);
+
+            courseLibraryRepository.UpdateCourse(databaseResult);
+
+            courseLibraryRepository.Save();
+
+            return CreatedAtRoute("getCourse",
+                new { authorId = update.AuthorId, courseId = update.Id }
+                , mapper.Map<UpdateCourseDto>(update));
+        }*/
+
+
+        // DELETING
+
+        [HttpDelete("{courseId}")]
+        public ActionResult DeleteCourse(Guid authorId, Guid courseId)
+        {
+            if (!courseLibraryRepository.AuthorExists(authorId))
+                return NotFound();
+
+            var databaseResult = courseLibraryRepository.GetCourse(authorId, courseId);
+
+            if (databaseResult == null)
+                return NotFound();
+
+            courseLibraryRepository.DeleteCourse(databaseResult);
+
+            courseLibraryRepository.Save();
+
+            return NoContent();
         }
     }
 }
