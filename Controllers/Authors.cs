@@ -104,11 +104,30 @@ namespace CourseLibrary.API.Controllers
             return Ok(mapper.Map<AuthorDto>(databaseResult));
         }
 
+        //OPTIONS
+
         [HttpOptions]
         public IActionResult GetAuthorsOptions()
         {
             Response.Headers.Add("Allow", "GET, POST, DELETE, OPTIONS");
             return Ok();
+        }
+
+        // DELETING
+
+        [HttpDelete("{authorId}")]
+        public ActionResult DeleteAuthor(Guid authorId)
+        {
+            if (!courseLib.AuthorExists(authorId))
+                return NotFound();
+
+            var databaseResult = courseLib.GetAuthor(authorId);
+
+            courseLib.DeleteAuthor(databaseResult);
+
+            courseLib.Save();
+
+            return NoContent();
         }
     }
 }

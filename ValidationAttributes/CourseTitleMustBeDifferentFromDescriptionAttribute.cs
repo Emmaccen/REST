@@ -12,14 +12,14 @@ namespace CourseLibrary.API.ValidationAttributes
         protected override ValidationResult IsValid(object value, 
             ValidationContext validationContext)
         {
-            var course = (IEnumerable<CreateCoursesDto>)validationContext.ObjectInstance;
+            var course = (IEnumerable<CourseForManipulationValidation>)validationContext.ObjectInstance;
 
             foreach (var c in course)
             {
                 if (c.Title == c.Description)
                 {
                     return new ValidationResult(ErrorMessage,
-                        new[] { nameof(CreateCoursesDto) });
+                        new[] { nameof(CourseForManipulationValidation) });
                 }
             }
 
